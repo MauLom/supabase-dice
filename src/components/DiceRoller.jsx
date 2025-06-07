@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
 import { motion, AnimatePresence } from "framer-motion";
 
 const diceFaces = {
@@ -17,6 +18,7 @@ export default function DiceRoller({ sessionId, nickname }) {
   const [rolling, setRolling] = useState(false);
   const [face, setFace] = useState(null);
   const [dice, setDice] = useState("D6");
+  const [comment, setComment] = useState("");
 
   const playSound = () => {
     const audio = new Audio("/dice.mp3");
@@ -27,7 +29,7 @@ export default function DiceRoller({ sessionId, nickname }) {
     setRolling(true);
     playSound();
 
-    // 1. Agrega la tirada pendiente ANTES de la animación
+    // Agrega la tirada pendiente ANTES de la animación, incluyendo el comentario
     const sessionRef = ref(db, `sessions/${sessionId}`);
     const snap = await get(sessionRef);
     const session = snap.val();
@@ -36,11 +38,12 @@ export default function DiceRoller({ sessionId, nickname }) {
       dice,
       timestamp: Date.now(),
       pending: true,
+      comment: comment.trim() || undefined,
     };
     const newRolls = [...(session.rolls || []), newRoll];
     await set(sessionRef, { ...session, rolls: newRolls });
 
-    // 2. Animación visual local
+    // Animación visual local
     let ticks = 0;
     function animateRoll() {
       ticks++;
@@ -56,7 +59,7 @@ export default function DiceRoller({ sessionId, nickname }) {
           setFace(value);
           setRolling(false);
 
-          // 3. Actualiza la tirada pendiente con el valor real y pending: false
+          // Actualiza la tirada pendiente con el valor real y pending: false
           const freshSnap = await get(sessionRef);
           const freshSession = freshSnap.val();
 
@@ -78,6 +81,7 @@ export default function DiceRoller({ sessionId, nickname }) {
             };
             await set(sessionRef, { ...freshSession, rolls: updatedRolls });
           }
+          setComment(""); // limpia el input después de lanzar
         }, 400);
       }
     }
@@ -100,6 +104,17 @@ export default function DiceRoller({ sessionId, nickname }) {
           <MenuItem value="D6">D6</MenuItem>
           <MenuItem value="D20">D20</MenuItem>
         </Select>
+      </Box>
+      <Box mb={2}>
+        <TextField
+          label="Referencia/Comentario"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          disabled={rolling}
+          size="small"
+          fullWidth
+          inputProps={{ maxLength: 60 }}
+        />
       </Box>
       <Box display="flex" flexDirection="column" alignItems="center">
         <Button

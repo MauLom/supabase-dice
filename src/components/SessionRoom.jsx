@@ -2,8 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { ref, onValue, off } from "firebase/database";
 import { db } from "../firebaseClient";
 import DiceRoller from "./DiceRoller";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -15,6 +13,18 @@ import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
+
+// --- Etiqueta humorística en base al resultado ---
+function getFunnyLabel(roll) {
+  if (roll.pending) return null;
+  if (roll.value === 1) return "¡Fallo épico! 🤦‍♂️";
+  if (roll.value === 20) return "¡Crítico legendario! 🏆";
+  if (roll.value === 6 && roll.dice === "D6") return "¡Golpe maestro! 🎯";
+  if (roll.value === 2) return "Mejor suerte la próxima... 😬";
+  if (roll.value > 15) return "¡Tirazo! 🔥";
+  if (roll.value < 5) return "¿Seguro que no es una moneda...? 🪙";
+  return null;
+}
 
 export default function SessionRoom({ sessionId, nickname }) {
   const [session, setSession] = useState(null);
@@ -136,93 +146,121 @@ export default function SessionRoom({ sessionId, nickname }) {
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
           Tiradas:
         </Typography>
-        <List sx={{ width: "100%" }}>
-          {session.rolls?.length > 0 ? (
-            session.rolls
-              .slice()
-              .reverse()
-              .map((r, i) => (
-                <ListItem
-                  key={i}
-                  sx={{
-                    bgcolor:
-                      r.nick === nickname
-                        ? "success.light"
-                        : "grey.100",
-                    borderRadius: 2,
-                    mb: 1,
-                    py: 1,
-                    px: 2,
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                  disableGutters
-                >
-                  <Avatar
+        <Box
+          sx={{
+            width: "100%",
+            maxHeight: 240,
+            overflowY: "auto",
+            mb: 1,
+            pr: 1,
+          }}
+        >
+          <List sx={{ width: "100%" }}>
+            {session.rolls?.length > 0 ? (
+              session.rolls
+                .slice()
+                .reverse()
+                .map((r, i) => (
+                  <ListItem
+                    key={i}
                     sx={{
-                      width: 28,
-                      height: 28,
                       bgcolor:
                         r.nick === nickname
-                          ? "success.main"
-                          : "primary.main",
-                      mr: 2,
-                      fontSize: 15,
+                          ? "success.light"
+                          : "grey.100",
+                      borderRadius: 2,
+                      mb: 1,
+                      py: 1,
+                      px: 2,
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
+                    disableGutters
                   >
-                    {r.nick[0]?.toUpperCase() || "?"}
-                  </Avatar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography
+                    <Avatar
                       sx={{
-                        fontWeight: r.nick === nickname ? "bold" : "normal",
-                        display: "inline",
-                        mr: 1,
-                      }}
-                      color={r.nick === nickname ? "success.dark" : "primary.dark"}
-                    >
-                      {r.nick}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        display: "inline",
-                        fontWeight: "bold",
-                        mr: 1,
+                        width: 28,
+                        height: 28,
+                        bgcolor:
+                          r.nick === nickname
+                            ? "success.main"
+                            : "primary.main",
+                        mr: 2,
+                        fontSize: 15,
                       }}
                     >
-                      {r.pending ? (
-                        <Box display="inline-flex" alignItems="center">
-                          <CircularProgress size={18} color="warning" sx={{ mr: 1 }} />
-                          <span style={{ color: "#f39c12", fontStyle: "italic" }}>
-                            Lanzando...
-                          </span>
-                        </Box>
-                      ) : (
-                        r.value
+                      {r.nick[0]?.toUpperCase() || "?"}
+                    </Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography
+                        sx={{
+                          fontWeight: r.nick === nickname ? "bold" : "normal",
+                          display: "inline",
+                          mr: 1,
+                        }}
+                        color={r.nick === nickname ? "success.dark" : "primary.dark"}
+                      >
+                        {r.nick}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          display: "inline",
+                          fontWeight: "bold",
+                          mr: 1,
+                        }}
+                      >
+                        {r.pending ? (
+                          <Box display="inline-flex" alignItems="center">
+                            <CircularProgress size={18} color="warning" sx={{ mr: 1 }} />
+                            <span style={{ color: "#f39c12", fontStyle: "italic" }}>
+                              Lanzando...
+                            </span>
+                          </Box>
+                        ) : (
+                          r.value
+                        )}
+                      </Typography>
+                      <Chip
+                        label={r.dice}
+                        size="small"
+                        color={r.dice === "D20" ? "secondary" : "default"}
+                      />
+                      {/* Muestra el comentario si existe */}
+                      {r.comment && (
+                        <Chip
+                          label={r.comment}
+                          size="small"
+                          color="info"
+                          sx={{ ml: 1, fontStyle: "italic", opacity: 0.8 }}
+                        />
                       )}
+                      {/* Label humorístico si aplica */}
+                      {getFunnyLabel(r) && (
+                        <Chip
+                          label={getFunnyLabel(r)}
+                          size="small"
+                          color="secondary"
+                          sx={{ ml: 1 }}
+                        />
+                      )}
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(r.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Typography>
-                    <Chip
-                      label={r.dice}
-                      size="small"
-                      color={r.dice === "D20" ? "secondary" : "default"}
-                    />
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {new Date(r.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </Typography>
-                </ListItem>
-              ))
-          ) : (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              Nadie ha tirado dados aún.
-            </Typography>
-          )}
-        </List>
+                  </ListItem>
+                ))
+            ) : (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                Nadie ha tirado dados aún.
+              </Typography>
+            )}
+          </List>
+        </Box>
       </Paper>
       {/* Toast */}
       <Snackbar
