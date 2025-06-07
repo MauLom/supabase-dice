@@ -14,6 +14,7 @@ function App() {
   return (
     <Box
       minHeight="100vh"
+      minWidth="100%"
       sx={{
         background: "linear-gradient(120deg, #e0ecfc 0%, #c7eafd 100%)",
         width: "100vw",
@@ -24,7 +25,7 @@ function App() {
     >
       <Grid container sx={{ height: "100vh" }}>
         {/* Columna izquierda vacía */}
-        <Grid item xs={false} md={3} />
+        {/* <Grid item xs={false} md={3} /> */}
         {/* Columna central: tu contenido */}
         <Grid
           item
@@ -36,13 +37,12 @@ function App() {
           justifyContent="center"
           sx={{ minHeight: "100vh" }}
         >
-          <Container maxWidth="sm" sx={{ py: 6 }}>
+          <Container  sx={{ py: 6 }}>
             <Typography
               variant="h3"
               fontWeight="bold"
               align="center"
               color="primary"
-              mb={4}
               sx={{ textShadow: "0 2px 12px #fff" }}
             >
               🎲 Firebase Dice Room
@@ -58,7 +58,7 @@ function App() {
           </Container>
         </Grid>
         {/* Columna derecha vacía */}
-        <Grid item xs={false} md={3} />
+        {/* <Grid item xs={false} md={3} /> */}
       </Grid>
     </Box>
   );

@@ -190,54 +190,54 @@ export default function DiceRoller({ sessionId, nickname }) {
                 >
                     {rolling ? "Rodando..." : "¡Tirar!"}
                 </Button>
-                <Box display="flex" flexDirection="row" alignItems="center">
+                <Box
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{
+                        minHeight: 110,
+                        minWidth: 240,
+                        maxWidth: 360,
+                        width: "100%",
+                        mb: 2,
+                    }}
+                >
                     <AnimatePresence>
-                        {face.length > 0 && (
+                        {face.length > 0 ? (
                             <motion.div
-                                key={face.join(",") + diceType + rolling}
-                                initial={{ rotate: -120, opacity: 0, scale: 0.7 }}
-                                animate={{
-                                    rotate: rolling ? 360 : 0,
-                                    opacity: 1,
-                                    scale: 1,
-                                    transition: { type: "spring", duration: 0.6 },
-                                }}
-                                exit={{ opacity: 0, scale: 0.7 }}
+                                // ...transiciones
                                 style={{
-                                    display: "inline-block",
-                                    marginTop: "18px",
-                                    fontSize: "2.5rem",
-                                    fontWeight: 700,
-                                    background:
-                                        diceType === "D20"
-                                            ? "linear-gradient(120deg, #a7d2fd, #377cfb)"
-                                            : "linear-gradient(120deg, #fdf2a7, #fdc337)",
-                                    borderRadius: "15%",
-                                    minWidth: "80px",
-                                    minHeight: "80px",
-                                    lineHeight: "80px",
-                                    boxShadow: "0 2px 16px #377cfb33",
-                                    border: "4px solid #fff",
-                                    userSelect: "none",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "100%",
+                                    minHeight: 90,
+                                    minWidth: 210,
                                 }}
                             >
-                                {face.length === 1
-                                    ? face[0]
-                                    : face.map((v, i) => (
-                                        <span
-                                            key={i}
-                                            style={{
-                                                margin: "0 4px",
-                                                fontSize: "1.7em",
-                                            }}
-                                        >
-                                            {v}
-                                        </span>
-                                    ))}
+                                {face.map((v, i) => (
+                                    <span
+                                        key={i}
+                                        style={{
+                                            margin: "0 10px",
+                                            fontSize: "2.2rem",
+                                            minWidth: 48,
+                                            display: "inline-block",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {v}
+                                    </span>
+                                ))}
                             </motion.div>
+                        ) : (
+                            // Si no hay cara mostrada, reserva el espacio igual
+                            <Box sx={{ minHeight: 90, minWidth: 210 }} />
                         )}
                     </AnimatePresence>
                 </Box>
+
             </Box>
         </Box>
     );
