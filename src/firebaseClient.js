@@ -2,14 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAh-7QQAubic9bLi3w6CBvfWUMJ7c0U5FQ",
-  authDomain: "realtimedicerollerse.firebaseapp.com",
-  databaseURL: "https://realtimedicerollerse-default-rtdb.firebaseio.com",
-  projectId: "realtimedicerollerse",
-  storageBucket: "realtimedicerollerse.firebasestorage.app",
-  messagingSenderId: "294869060509",
-  appId: "1:294869060509:web:9679fc14fdcb2bcba83d74",
-  measurementId: "G-B4G47MK14V"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);

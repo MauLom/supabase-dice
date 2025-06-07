@@ -14,6 +14,7 @@ import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function SessionRoom({ sessionId, nickname }) {
   const [session, setSession] = useState(null);
@@ -27,15 +28,21 @@ export default function SessionRoom({ sessionId, nickname }) {
     const unsubscribe = onValue(sessionRef, (snapshot) => {
       const data = snapshot.val();
       setSession(data);
+
       if (
         data &&
         prevRollCount.current !== undefined &&
         prevRollCount.current !== 0 &&
         data.rolls.length > prevRollCount.current
       ) {
-        const lastRoll = data.rolls[data.rolls.length - 1];
-        setToastMsg(`${lastRoll.nick} tiró un ${lastRoll.dice}: ${lastRoll.value}`);
-        setToastOpen(true);
+        // Última tirada que no esté pendiente
+        const lastRoll = [...data.rolls]
+          .reverse()
+          .find((r) => !r.pending);
+        if (lastRoll) {
+          setToastMsg(`${lastRoll.nick} tiró un ${lastRoll.dice}: ${lastRoll.value}`);
+          setToastOpen(true);
+        }
       }
       prevRollCount.current = data?.rolls?.length || 0;
     });
@@ -185,7 +192,16 @@ export default function SessionRoom({ sessionId, nickname }) {
                         mr: 1,
                       }}
                     >
-                      {r.value}
+                      {r.pending ? (
+                        <Box display="inline-flex" alignItems="center">
+                          <CircularProgress size={18} color="warning" sx={{ mr: 1 }} />
+                          <span style={{ color: "#f39c12", fontStyle: "italic" }}>
+                            Lanzando...
+                          </span>
+                        </Box>
+                      ) : (
+                        r.value
+                      )}
                     </Typography>
                     <Chip
                       label={r.dice}
